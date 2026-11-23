@@ -14,13 +14,37 @@ import urllib.request
 from typing import Any
 
 try:
-    import yaml
+    import yaml  # type: ignore
 except ImportError:
-    print(
-        "エラー: PyYAML が見つかりません。`bash bootstrap.sh` または `pip install --user pyyaml` を実行してください。",
-        file=sys.stderr,
-    )
-    sys.exit(2)
+    yaml = None
+
+
+def parse_simple_yaml(text: str) -> dict[str, Any]:
+    """PyYAML が無い環境でも config/watch_repos.yaml を読むための軽量パーサ。"""
+    repos: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or line == "repos:":
+            continue
+        if line.startswith("- "):
+            if current:
+                repos.append(current)
+            current = {}
+            line = line[2:].strip()
+        if current is not None and ":" in line:
+            k, v = line.split(":", 1)
+            current[k.strip()] = v.strip().strip('"').strip("'")
+    if current:
+        repos.append(current)
+    return {"repos": repos}
+
+
+def load_config(path: pathlib.Path) -> dict[str, Any]:
+    text = path.read_text(encoding="utf-8")
+    if yaml is not None:
+        return yaml.safe_load(text) or {}
+    return parse_simple_yaml(text)
 
 API_BASE = "https://api.github.com"
 DEFAULT_CONFIG = pathlib.Path(__file__).resolve().parent.parent / "config" / "watch_repos.yaml"
@@ -143,7 +167,7 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="状態ファイルを更新せず結果だけ表示")
     args = parser.parse_args()
 
-    cfg = yaml.safe_load(args.config.read_text(encoding="utf-8")) or {}
+    cfg = load_config(args.config)
     repos = cfg.get("repos") or []
     if not repos:
         print("監視対象が config に登録されていません。")
