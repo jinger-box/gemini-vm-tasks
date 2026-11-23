@@ -1,0 +1,14 @@
+# 監視対象リポジトリ一覧
+# mode:
+#   - releases: GitHub Releases の新着タグを監視
+#   - commits:  指定ブランチ（省略時はデフォルトブランチ）の最新コミットを監視
+
+repos:
+  - repo: seedds/nxnative
+    mode: commits
+    branch: main
+    note: Switch 向けビルドツールの最新コミット動向
+
+  - repo: google-gemini/gemini-cli
+    mode: releases
+    note: Gemini CLI の新着リリース確認
