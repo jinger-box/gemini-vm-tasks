@@ -2,13 +2,13 @@
 
 ## 1. 初回セットアップ用（専用 VM の初期化）
 
-リポジトリを GitHub に push したあと、`<リポジトリURL>` を書き換えて Gemini Web に貼ります。
+リポジトリ URL をそのまま使って Gemini Web に貼ります。
 
 ```text
 専用VM（ネットワークアクセス有効）で、GitHub 更新監視タスクの環境をセットアップしてください。
 
 手順:
-1. `~/workspace` を作成し、`git clone <リポジトリURL> ~/workspace/gemini-vm-tasks` を実行する
+1. `~/workspace` を作成し、`git clone https://github.com/jinger-box/gemini-vm-tasks.git ~/workspace/gemini-vm-tasks` を実行する
 2. `bash ~/workspace/gemini-vm-tasks/bootstrap.sh` を実行してディレクトリと必要パッケージを整える
 3. `python3 ~/workspace/gemini-vm-tasks/scripts/watch_github.py` を1回実行し、初回ベースラインを `~/workspace/state/github_watch.json` に記録する
 4. 実行結果とエラーの有無を日本語で簡潔に報告する
